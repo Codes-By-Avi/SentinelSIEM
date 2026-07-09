@@ -4,3 +4,5 @@ FAILED LOGIN user admin from 192.168.1.50
 FAILED LOGIN user admin from 192.168.1.50
 FAILED LOGIN user admin from 192.168.1.50
 INFO User admin logged out
+INFO User admin logged in from 185.44.22.10
+USER admin granted ROOT privileges

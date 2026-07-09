@@ -10,5 +10,25 @@
             "FAILED LOGIN user admin from 192.168.1.50",
             "FAILED LOGIN user admin from 192.168.1.50"
         ]
+    },
+    {
+        "severity": "MEDIUM",
+        "type": "Suspicious External Login",
+        "source_ip": "185.44.22.10",
+        "attempts": 1,
+        "threat_score": 50,
+        "events": [
+            "INFO User admin logged in from 185.44.22.10"
+        ]
+    },
+    {
+        "severity": "HIGH",
+        "type": "Privilege Escalation Attempt",
+        "source_ip": "Unknown",
+        "attempts": 1,
+        "threat_score": 90,
+        "events": [
+            "USER admin granted ROOT privileges"
+        ]
     }
 ]

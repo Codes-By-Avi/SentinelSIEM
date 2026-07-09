@@ -18,6 +18,9 @@ alerts = []
 alert_records = []
 source_ips = []
 
+suspicious_logins = []
+privilege_events = []
+
 for log in logs:
 
     if "FAILED LOGIN" in log:
@@ -28,6 +31,14 @@ for log in logs:
         ip = log.split("from")[-1].strip()
 
         source_ips.append(ip)
+
+    if "logged in from 185." in log:
+        suspicious_logins.append(log.strip())
+
+
+    if "ROOT privileges" in log:
+        privilege_events.append(log.strip())    
+        
 
 
 print("\nSecurity Analysis Complete")
@@ -63,6 +74,44 @@ if failed_logins >= 3:
 
 else:
     print("\nNo major threats detected.")
+
+
+if suspicious_logins:
+
+    suspicious_alert = {
+        "severity": "MEDIUM",
+        "type": "Suspicious External Login",
+        "source_ip": suspicious_logins[0].split("from")[-1].strip(),
+        "attempts": 1,
+        "threat_score": 50,
+        "events": suspicious_logins
+    }
+
+    alert_records.append(suspicious_alert)
+
+    print("\nALERT LEVEL:", suspicious_alert["severity"])
+    print("Threat:", suspicious_alert["type"])
+    print("Source IP:", suspicious_alert["source_ip"])
+    print("Threat Score:", suspicious_alert["threat_score"], "/100")
+
+
+if privilege_events:
+
+    privilege_alert = {
+        "severity": "HIGH",
+        "type": "Privilege Escalation Attempt",
+        "source_ip": "Unknown",
+        "attempts": 1,
+        "threat_score": 90,
+        "events": privilege_events
+    }
+
+    alert_records.append(privilege_alert)
+
+    print("\nALERT LEVEL:", privilege_alert["severity"])
+    print("Threat:", privilege_alert["type"])
+    print("Event:", privilege_events[0])
+    print("Threat Score:", privilege_alert["threat_score"], "/100")
 
 
 file.close()
