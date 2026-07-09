@@ -1,0 +1,6 @@
+INFO User admin logged in from 192.168.1.10
+INFO User jsmith logged in from 192.168.1.15
+FAILED LOGIN user admin from 192.168.1.50
+FAILED LOGIN user admin from 192.168.1.50
+FAILED LOGIN user admin from 192.168.1.50
+INFO User admin logged out
