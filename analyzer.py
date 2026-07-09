@@ -1,4 +1,5 @@
 import json
+from database import save_alert
 
 print("================================")
 print("        SentinelSIEM v0.2")
@@ -115,6 +116,9 @@ if privilege_events:
 
 
 file.close()
+
+for alert in alert_records:
+    save_alert(alert)
 
 with open("alerts.json", "w") as output:
     json.dump(alert_records, output, indent=4)
