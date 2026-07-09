@@ -1,8 +1,9 @@
-from flask import Flask, render_template_string, redirect
+from flask import Flask, render_template_string, redirect, request
 import sqlite3
 from database import update_alert_status
 
 app = Flask(__name__)
+
 
 @app.route("/investigate/<int:alert_id>")
 def investigate(alert_id):
@@ -11,8 +12,14 @@ def investigate(alert_id):
 
     return redirect("/")
 
+
 @app.route("/")
 def dashboard():
+
+    search = request.args.get("search", "")
+
+    severity_filter = request.args.get("severity", "ALL")
+
 
     connection = sqlite3.connect("sentinelsiem.db")
 
@@ -20,29 +27,72 @@ def dashboard():
 
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM alerts")
+
+    query = "SELECT * FROM alerts WHERE 1=1"
+
+    values = []
+
+
+    if search:
+
+        query += " AND source_ip LIKE ?"
+
+        values.append("%" + search + "%")
+
+
+    if severity_filter != "ALL":
+
+        query += " AND severity = ?"
+
+        values.append(severity_filter)
+
+
+    cursor.execute(query, values)
 
     alerts = cursor.fetchall()
+
+
+    cursor.execute("SELECT * FROM alerts")
+
+    all_alerts = cursor.fetchall()
+
 
     connection.close()
 
 
-    total_alerts = len(alerts)
+
+    total_alerts = len(all_alerts)
+
 
     high_alerts = sum(
-        1 for alert in alerts
+        1 for alert in all_alerts
         if alert["severity"] == "HIGH"
     )
 
+
     medium_alerts = sum(
-        1 for alert in alerts
+        1 for alert in all_alerts
         if alert["severity"] == "MEDIUM"
     )
 
+
+    open_alerts = sum(
+        1 for alert in all_alerts
+        if alert["status"] == "OPEN"
+    )
+
+
+    investigated_alerts = sum(
+        1 for alert in all_alerts
+        if alert["status"] == "INVESTIGATED"
+    )
+
+
     highest_score = max(
-        [alert["threat_score"] for alert in alerts],
+        [alert["threat_score"] for alert in all_alerts],
         default=0
     )
+
 
 
     page = """
@@ -53,51 +103,59 @@ def dashboard():
 
 <title>SentinelSIEM Dashboard</title>
 
+
 <style>
 
 body {
     font-family: Arial;
     background-color: #f4f4f4;
-    padding: 40px;
+    padding:40px;
 }
 
-h1 {
-    color: #222;
-}
 
 .alert {
-    background: white;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 10px;
-    border-left: 8px solid;
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:10px;
+    border-left:8px solid;
 }
+
 
 .high {
-    border-color: red;
-    color: red;
-    font-weight: bold;
+    border-color:red;
+    color:red;
+    font-weight:bold;
 }
+
 
 .medium {
-    border-color: orange;
-    color: orange;
-    font-weight: bold;
+    border-color:orange;
+    color:orange;
+    font-weight:bold;
 }
+
 
 .score {
-    font-size: 20px;
-    font-weight: bold;
+    font-size:20px;
+    font-weight:bold;
 }
 
+
 .overview {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+
+button {
+    padding:8px;
 }
 
 
 </style>
+
 
 </head>
 
@@ -110,25 +168,19 @@ h1 {
 
 <div class="overview">
 
+
 <h2>Security Overview</h2>
 
 
-<p>
-Total Alerts:
-{{ total_alerts }}
-</p>
+<p>Total Alerts: {{ total_alerts }}</p>
 
+<p>High Severity: {{ high_alerts }}</p>
 
-<p>
-High Severity:
-{{ high_alerts }}
-</p>
+<p>Medium Severity: {{ medium_alerts }}</p>
 
+<p>Open Alerts: {{ open_alerts }}</p>
 
-<p>
-Medium Severity:
-{{ medium_alerts }}
-</p>
+<p>Investigated Alerts: {{ investigated_alerts }}</p>
 
 
 <p class="score">
@@ -141,7 +193,43 @@ Highest Threat Score:
 
 
 
+<h2>Search Alerts</h2>
+
+
+<form method="get">
+
+
+<input 
+type="text"
+name="search"
+placeholder="Search IP address"
+value="{{ search }}"
+>
+
+
+<select name="severity">
+
+<option value="ALL">ALL</option>
+
+<option value="HIGH">HIGH</option>
+
+<option value="MEDIUM">MEDIUM</option>
+
+</select>
+
+
+<button type="submit">
+Search
+</button>
+
+
+</form>
+
+
+
+
 <h2>Security Alerts</h2>
+
 
 
 {% for alert in alerts %}
@@ -157,11 +245,9 @@ Highest Threat Score:
 
 <p>
 Severity:
-
 <span class="{{ alert.severity.lower() }}">
 {{ alert.severity }}
 </span>
-
 </p>
 
 
@@ -172,7 +258,7 @@ Source IP:
 
 
 <p>
-Failed Attempts:
+Attempts:
 {{ alert.attempts }}
 </p>
 
@@ -188,11 +274,20 @@ Status:
 {{ alert.status }}
 </p>
 
+
+
+{% if alert.status == "OPEN" %}
+
 <a href="/investigate/{{ alert.id }}">
+
 <button>
 Mark Investigated
 </button>
+
 </a>
+
+{% endif %}
+
 
 
 <p>
@@ -221,7 +316,10 @@ Detected:
         total_alerts=total_alerts,
         high_alerts=high_alerts,
         medium_alerts=medium_alerts,
-        highest_score=highest_score
+        open_alerts=open_alerts,
+        investigated_alerts=investigated_alerts,
+        highest_score=highest_score,
+        search=search
     )
 
 
