@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 
 def create_database():
@@ -20,7 +21,11 @@ def create_database():
 
         attempts INTEGER,
 
-        threat_score INTEGER
+        threat_score INTEGER,
+
+        timestamp TEXT,
+
+        status TEXT
 
     )
     """)
@@ -30,11 +35,15 @@ def create_database():
     connection.close()
 
 
+
 def save_alert(alert):
 
     connection = sqlite3.connect("sentinelsiem.db")
 
     cursor = connection.cursor()
+
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
     cursor.execute("""
     INSERT INTO alerts
@@ -43,10 +52,12 @@ def save_alert(alert):
         alert_type,
         source_ip,
         attempts,
-        threat_score
+        threat_score,
+        timestamp,
+        status
     )
 
-    VALUES (?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
 
     """,
     (
@@ -54,12 +65,16 @@ def save_alert(alert):
         alert["type"],
         alert["source_ip"],
         alert["attempts"],
-        alert["threat_score"]
+        alert["threat_score"],
+        current_time,
+        "OPEN"
     ))
+
 
     connection.commit()
 
     connection.close()
+
 
 
 create_database()

@@ -19,22 +19,23 @@ def dashboard():
 
     connection.close()
 
+
     total_alerts = len(alerts)
 
     high_alerts = sum(
-    1 for alert in alerts
-    if alert["severity"] == "HIGH"
-)
+        1 for alert in alerts
+        if alert["severity"] == "HIGH"
+    )
 
     medium_alerts = sum(
-    1 for alert in alerts
-    if alert["severity"] == "MEDIUM"
-)
+        1 for alert in alerts
+        if alert["severity"] == "MEDIUM"
+    )
 
     highest_score = max(
-    [alert["threat_score"] for alert in alerts],
-    default=0
-)
+        [alert["threat_score"] for alert in alerts],
+        default=0
+    )
 
 
     page = """
@@ -82,6 +83,13 @@ h1 {
     font-weight: bold;
 }
 
+.overview {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+
 </style>
 
 </head>
@@ -92,49 +100,61 @@ h1 {
 
 <h1>🛡️ SentinelSIEM Dashboard</h1>
 
-<h2>Security Alerts</h2>
 
-<div class="alert">
+<div class="overview">
 
 <h2>Security Overview</h2>
+
 
 <p>
 Total Alerts:
 {{ total_alerts }}
 </p>
 
+
 <p>
 High Severity:
 {{ high_alerts }}
 </p>
+
 
 <p>
 Medium Severity:
 {{ medium_alerts }}
 </p>
 
+
 <p class="score">
 Highest Threat Score:
 {{ highest_score }}/100
 </p>
 
+
 </div>
+
+
+
+<h2>Security Alerts</h2>
 
 
 {% for alert in alerts %}
 
 
-<div class="alert {{ alert.severity.lower() }}">
+<div class="alert">
 
 
-<h2>{{ alert.alert_type }}</h2>
+<h2>
+{{ alert.alert_type }}
+</h2>
 
 
 <p>
 Severity:
+
 <span class="{{ alert.severity.lower() }}">
 {{ alert.severity }}
 </span>
+
 </p>
 
 
@@ -156,10 +176,23 @@ Threat Score:
 </p>
 
 
+<p>
+Status:
+{{ alert.status }}
+</p>
+
+
+<p>
+Detected:
+{{ alert.timestamp }}
+</p>
+
+
 </div>
 
 
 {% endfor %}
+
 
 
 </body>
@@ -170,13 +203,13 @@ Threat Score:
 
 
     return render_template_string(
-    page,
-    alerts=alerts,
-    total_alerts=total_alerts,
-    high_alerts=high_alerts,
-    medium_alerts=medium_alerts,
-    highest_score=highest_score
-)
+        page,
+        alerts=alerts,
+        total_alerts=total_alerts,
+        high_alerts=high_alerts,
+        medium_alerts=medium_alerts,
+        highest_score=highest_score
+    )
 
 
 
