@@ -1,8 +1,15 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, redirect
 import sqlite3
+from database import update_alert_status
 
 app = Flask(__name__)
 
+@app.route("/investigate/<int:alert_id>")
+def investigate(alert_id):
+
+    update_alert_status(alert_id, "INVESTIGATED")
+
+    return redirect("/")
 
 @app.route("/")
 def dashboard():
@@ -180,6 +187,12 @@ Threat Score:
 Status:
 {{ alert.status }}
 </p>
+
+<a href="/investigate/{{ alert.id }}">
+<button>
+Mark Investigated
+</button>
+</a>
 
 
 <p>

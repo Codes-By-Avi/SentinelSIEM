@@ -78,3 +78,22 @@ def save_alert(alert):
 
 
 create_database()
+
+def update_alert_status(alert_id, status):
+
+    connection = sqlite3.connect("sentinelsiem.db")
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        UPDATE alerts
+        SET status = ?
+        WHERE id = ?
+        """,
+        (status, alert_id)
+    )
+
+    connection.commit()
+
+    connection.close()
