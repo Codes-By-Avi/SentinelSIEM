@@ -1,5 +1,5 @@
 from flask import Flask, render_template_string
-import json
+import sqlite3
 
 app = Flask(__name__)
 
@@ -7,20 +7,30 @@ app = Flask(__name__)
 @app.route("/")
 def dashboard():
 
-    with open("alerts.json", "r") as file:
-        alerts = json.load(file)
+    connection = sqlite3.connect("sentinelsiem.db")
+
+    connection.row_factory = sqlite3.Row
+
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM alerts")
+
+    alerts = cursor.fetchall()
+
+    connection.close()
+
 
     page = """
-    
-    <html>
 
-    <head>
+<html>
 
-    <title>SentinelSIEM Dashboard</title>
+<head>
 
-    <style>
+<title>SentinelSIEM Dashboard</title>
 
-    body {
+<style>
+
+body {
     font-family: Arial;
     background-color: #f4f4f4;
     padding: 40px;
@@ -40,14 +50,13 @@ h1 {
 
 .high {
     border-color: red;
+    color: red;
+    font-weight: bold;
 }
 
 .medium {
     border-color: orange;
-}
-
-.high {
-    color: red;
+    color: orange;
     font-weight: bold;
 }
 
@@ -60,7 +69,9 @@ h1 {
 
 </head>
 
+
 <body>
+
 
 <h1>🛡️ SentinelSIEM Dashboard</h1>
 
@@ -69,13 +80,16 @@ h1 {
 
 {% for alert in alerts %}
 
+
 <div class="alert {{ alert.severity.lower() }}">
 
-<h2>{{ alert.type }}</h2>
+
+<h2>{{ alert.alert_type }}</h2>
+
 
 <p>
 Severity:
-<span class="high">
+<span class="{{ alert.severity.lower() }}">
 {{ alert.severity }}
 </span>
 </p>
@@ -98,19 +112,9 @@ Threat Score:
 {{ alert.threat_score }}/100
 </p>
 
-<h4>Events:</h4>
-
-<ul>
-
-{% for event in alert.events %}
-
-<li>{{ event }}</li>
-
-{% endfor %}
-
-</ul>
 
 </div>
+
 
 {% endfor %}
 
@@ -119,11 +123,11 @@ Threat Score:
 
 </html>
 
+"""
 
-    
-    """
 
     return render_template_string(page, alerts=alerts)
+
 
 
 app.run(debug=True)
