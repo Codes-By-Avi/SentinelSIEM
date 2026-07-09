@@ -35,7 +35,15 @@ h1 {
     padding: 20px;
     margin: 20px 0;
     border-radius: 10px;
-    border-left: 8px solid red;
+    border-left: 8px solid;
+}
+
+.high {
+    border-color: red;
+}
+
+.medium {
+    border-color: orange;
 }
 
 .high {
@@ -61,7 +69,7 @@ h1 {
 
 {% for alert in alerts %}
 
-<div class="alert">
+<div class="alert {{ alert.severity.lower() }}">
 
 <h2>{{ alert.type }}</h2>
 
@@ -89,6 +97,18 @@ Failed Attempts:
 Threat Score:
 {{ alert.threat_score }}/100
 </p>
+
+<h4>Events:</h4>
+
+<ul>
+
+{% for event in alert.events %}
+
+<li>{{ event }}</li>
+
+{% endfor %}
+
+</ul>
 
 </div>
 
