@@ -19,6 +19,23 @@ def dashboard():
 
     connection.close()
 
+    total_alerts = len(alerts)
+
+    high_alerts = sum(
+    1 for alert in alerts
+    if alert["severity"] == "HIGH"
+)
+
+    medium_alerts = sum(
+    1 for alert in alerts
+    if alert["severity"] == "MEDIUM"
+)
+
+    highest_score = max(
+    [alert["threat_score"] for alert in alerts],
+    default=0
+)
+
 
     page = """
 
@@ -77,6 +94,32 @@ h1 {
 
 <h2>Security Alerts</h2>
 
+<div class="alert">
+
+<h2>Security Overview</h2>
+
+<p>
+Total Alerts:
+{{ total_alerts }}
+</p>
+
+<p>
+High Severity:
+{{ high_alerts }}
+</p>
+
+<p>
+Medium Severity:
+{{ medium_alerts }}
+</p>
+
+<p class="score">
+Highest Threat Score:
+{{ highest_score }}/100
+</p>
+
+</div>
+
 
 {% for alert in alerts %}
 
@@ -126,7 +169,14 @@ Threat Score:
 """
 
 
-    return render_template_string(page, alerts=alerts)
+    return render_template_string(
+    page,
+    alerts=alerts,
+    total_alerts=total_alerts,
+    high_alerts=high_alerts,
+    medium_alerts=medium_alerts,
+    highest_score=highest_score
+)
 
 
 
