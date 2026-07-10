@@ -295,6 +295,28 @@ Detected:
 {{ alert.timestamp }}
 </p>
 
+<h4>Threat Intelligence</h4>
+
+<p>
+Country:
+{{ alert.country }}
+</p>
+
+<p>
+Reputation:
+{{ alert.reputation }}
+</p>
+
+<p>
+Confidence:
+{{ alert.confidence }}
+</p>
+
+<p>
+Known Botnet:
+{{ alert.known_botnet }}
+</p>
+
 
 </div>
 

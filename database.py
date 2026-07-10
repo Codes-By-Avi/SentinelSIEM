@@ -25,7 +25,15 @@ def create_database():
 
         timestamp TEXT,
 
-        status TEXT
+        status TEXT,
+
+        country TEXT,
+
+        reputation TEXT,
+
+        confidence TEXT,
+
+        known_botnet TEXT
 
     )
     """)
@@ -44,7 +52,6 @@ def save_alert(alert):
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-
     cursor.execute("""
     INSERT INTO alerts
     (
@@ -54,10 +61,14 @@ def save_alert(alert):
         attempts,
         threat_score,
         timestamp,
-        status
+        status,
+        country,
+        reputation,
+        confidence,
+        known_botnet
     )
 
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
     """,
     (
@@ -67,17 +78,18 @@ def save_alert(alert):
         alert["attempts"],
         alert["threat_score"],
         current_time,
-        "OPEN"
+        "OPEN",
+        alert["country"],
+        alert["reputation"],
+        alert["confidence"],
+        alert["known_botnet"]
     ))
-
 
     connection.commit()
 
     connection.close()
 
 
-
-create_database()
 
 def update_alert_status(alert_id, status):
 
@@ -97,3 +109,7 @@ def update_alert_status(alert_id, status):
     connection.commit()
 
     connection.close()
+
+
+
+create_database()

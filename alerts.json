@@ -9,6 +9,10 @@
             "Jul 09 15:20:01 server sshd[1234]: Failed password for invalid user root from 203.0.113.55 port 22 ssh2",
             "Jul 09 15:20:03 server sshd[1235]: Failed password for invalid user admin from 203.0.113.55 port 22 ssh2",
             "Jul 09 15:20:05 server sshd[1236]: Failed password for invalid user admin from 203.0.113.55 port 22 ssh2"
-        ]
+        ],
+        "country": "Unknown",
+        "reputation": "Malicious",
+        "confidence": "High",
+        "known_botnet": "Yes"
     }
 ]
