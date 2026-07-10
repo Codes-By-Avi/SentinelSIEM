@@ -1,5 +1,6 @@
-from flask import Flask, render_template_string, redirect, request
+from flask import Flask, render_template_string, redirect, send_file, request
 import sqlite3
+import csv
 from database import update_alert_status
 
 app = Flask(__name__)
@@ -12,6 +13,45 @@ def investigate(alert_id):
 
     return redirect("/")
 
+@app.route("/export")
+def export():
+
+    connection = sqlite3.connect("sentinelsiem.db")
+
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM alerts")
+
+    alerts = cursor.fetchall()
+
+    connection.close()
+
+
+    with open("sentinelsiem_alerts.csv", "w", newline="") as file:
+
+        writer = csv.writer(file)
+
+        writer.writerow([
+            "ID",
+            "Severity",
+            "Type",
+            "Source IP",
+            "Attempts",
+            "Threat Score",
+            "Timestamp",
+            "Status"
+        ])
+
+
+        for alert in alerts:
+
+            writer.writerow(alert[:8])
+
+
+    return send_file(
+        "sentinelsiem_alerts.csv",
+        as_attachment=True
+    )
 
 @app.route("/")
 def dashboard():
@@ -107,50 +147,129 @@ def dashboard():
 <style>
 
 body {
-    font-family: Arial;
-    background-color: #f4f4f4;
-    padding:40px;
+
+    font-family: Arial, sans-serif;
+
+    background-color: #111827;
+
+    color: white;
+
+    padding: 40px;
+
 }
 
 
-.alert {
-    background:white;
-    padding:20px;
-    margin:20px 0;
-    border-radius:10px;
-    border-left:8px solid;
-}
+h1 {
 
+    color: #38bdf8;
 
-.high {
-    border-color:red;
-    color:red;
-    font-weight:bold;
-}
-
-
-.medium {
-    border-color:orange;
-    color:orange;
-    font-weight:bold;
-}
-
-
-.score {
-    font-size:20px;
-    font-weight:bold;
 }
 
 
 .overview {
-    background:white;
-    padding:20px;
-    border-radius:10px;
+
+    background: #1f2937;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.alert {
+
+    background: #1f2937;
+
+    padding: 25px;
+
+    margin: 20px 0;
+
+    border-radius: 12px;
+
+    border-left: 8px solid;
+
+}
+
+
+.high {
+
+    border-color: red;
+
+    color: #ff6b6b;
+
+    font-weight: bold;
+
+}
+
+
+.medium {
+
+    border-color: orange;
+
+    color: #fbbf24;
+
+    font-weight: bold;
+
+}
+
+
+.score {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #38bdf8;
+
+}
+
+
+.intel {
+
+    background: #111827;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    margin-top: 15px;
+
 }
 
 
 button {
-    padding:8px;
+
+    background: #38bdf8;
+
+    border: none;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+}
+
+
+button:hover {
+
+    background: #0ea5e9;
+
+}
+
+
+input, select {
+
+    padding: 10px;
+
+    border-radius: 6px;
+
+    border: none;
+
 }
 
 
@@ -230,6 +349,13 @@ Search
 
 <h2>Security Alerts</h2>
 
+<a href="/export">
+
+<button>
+📄 Export Alerts CSV
+</button>
+
+</a>
 
 
 {% for alert in alerts %}
@@ -295,7 +421,9 @@ Detected:
 {{ alert.timestamp }}
 </p>
 
-<h4>Threat Intelligence</h4>
+<div class="intel">
+
+<h3>🌐 Threat Intelligence</h3>
 
 <p>
 Country:
@@ -316,6 +444,8 @@ Confidence:
 Known Botnet:
 {{ alert.known_botnet }}
 </p>
+
+</div>
 
 
 </div>
