@@ -106,13 +106,10 @@ http://127.0.0.1:5000
 
 ![Dashboard Overview](Screenshots/dashboard1.png)
 
-### Search & Filtering
+(Screenshots/dashboard2.png)
 
-![Search & Filtering](Screenshots/dashboard2.png)
 
-### Threat Intelligence
-
-![Threat Intelligence](Screenshots/dashboard3.png)
+(Screenshots/dashboard3.png)
 
 ### CSV Export
 
