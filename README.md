@@ -102,12 +102,21 @@ http://127.0.0.1:5000
 
 ## Screenshots
 
-Add screenshots of:
+### Dashboard Overview
 
-* Dashboard overview
-* Threat intelligence panel
-* Search and filtering
-* CSV export
+![Dashboard Overview](Screenshots/dashboard1.png)
+
+### Search & Filtering
+
+![Search & Filtering](Screenshots/dashboard2.png)
+
+### Threat Intelligence
+
+![Threat Intelligence](Screenshots/dashboard3.png)
+
+### CSV Export
+
+![CSV Export](Screenshots/csv-export.png)
 
 ---
 
