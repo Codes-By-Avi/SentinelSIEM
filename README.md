@@ -106,10 +106,9 @@ http://127.0.0.1:5000
 
 ![Dashboard Overview](Screenshots/dashboard1.png)
 
-(Screenshots/dashboard2.png)
+![Dashboard Overview (continued)](Screenshots/dashboard2.png)
 
-
-(Screenshots/dashboard3.png)
+![Dashboard Overview (continued)](Screenshots/dashboard3.png)
 
 ### CSV Export
 
